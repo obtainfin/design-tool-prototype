@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Drag-and-Drop Design Tool</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: #34495e;
+      margin-top: 20px;
+    }
+
+    #toolbox {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tool {
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      background-color: #ffffff;
+      width: 150px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, background-color 0.2s;
+      font-weight: bold;
+      color: #34495e;
+    }
+
+    .tool:hover {
+      background-color: #3498db;
+      color: white;
+      transform: translateY(-5px);
+    }
+
+    #canvas-container {
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    #canvas {
+      padding: 20px;
+      border: 2px dashed #ccc;
+      background-color: #ffffff;
+      width: 800px;
+      height: 500px;
+      position: relative;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .element {
+      padding: 10px;
+      position: absolute;
+      background-color: #ecf0f1;
+      border: 1px solid #bdc3c7;
+      border-radius: 8px;
+      resize: both;
+      overflow: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .element img {
+      width: 100px;
+      height: 100px;
+      border-radius: 6px;
+    }
+
+    .element .delete {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: #e74c3c;
+      color: white;
+      cursor: pointer;
+      padding: 5px;
+      font-size: 10px;
+      border-radius: 50%;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #controls {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Advanced Drag-and-Drop Design Tool</h1>
+
+  <div id="toolbox">
+    <div class="tool" draggable="true" id="text">Text Block</div>
+    <div class="tool" draggable="true" id="image">Image Block</div>
+  </div>
+
+  <div id="controls">
+    <select id="fontSelector" onchange="changeFont(this.value)">
+      <option value="Poppins">Poppins</option>
+      <option value="Arial">Arial</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Times New Roman">Times New Roman</option>
+    </select>
+
+    <input type="color" id="colorPicker" onchange="changeColor(this.value)" value="#34495e">
+
+    <button onclick="undo()">Undo</button>
+    <button onclick="redo()">Redo</button>
+  </div>
+
+  <div style="text-align: center;">
+    <button onclick="shuffleStyle()">Shuffle Style</button>
+    <button onclick="saveCanvas()">Save Design</button>
+  </div>
+
+  <div id="canvas-container">
+    <div id="canvas" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <p style="color: #aaa;">Drop elements here</p>
+    </div>
+  </div>
+
+  <script>
+    let currentStyle = 1;
+    let undoStack = [];
+    let redoStack = [];
+    let currentState = [];
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    document.querySelectorAll('.tool').forEach(item => {
+      item.addEventListener('dragstart', drag);
+    });
+
+    function drop(ev) {
+      ev.preventDefault();
+      let data = ev.dataTransfer.getData("text");
+
+      let element = document.createElement('div');
+      element.classList.add('element');
+
+      if (data === 'text') {
+        let editableText = document.createElement('div');
+        editableText.contentEditable = "true";
+        editableText.innerHTML = "Sample Text";
+        editableText.style.fontFamily = "'Poppins', sans-serif";
+        editableText.style.fontSize = "16px";
+        element.appendChild(editableText);
+      } else if (data === 'image') {
+        element.innerHTML = '<img src="https://via.placeholder.com/100">';
+      }
+
+      // Add delete button
+      let deleteButton = document.createElement('div');
+      deleteButton.classList.add('delete');
+      deleteButton.innerHTML = "X";
+      deleteButton.onclick = function() {
+        element.remove();
+      };
+      element.appendChild(deleteButton);
+
+      element.style.left = ev.clientX - ev.target.offsetLeft + 'px';
+      element.style.top = ev.clientY - ev.target.offsetTop + 'px';
+
+      document.getElementById('canvas').appendChild(element);
+
+      // Save to undo stack
+      saveState();
+    }
+
+    function shuffleStyle() {
+      const canvas = document.getElementById('canvas');
+      canvas.classList.remove('style-1', 'style-2', 'style-3');
+
+      currentStyle = currentStyle === 3 ? 1 : currentStyle + 1;
+      canvas.classList.add(`style-${currentStyle}`);
+    }
+
+    function saveCanvas() {
+      const canvas = document.getElementById('canvas');
+      html2canvas(canvas).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'design.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    function changeFont(font) {
+      const selectedText = document.querySelector('.element div[contentEditable="true"]');
+      if (selectedText) {
+        selectedText.style.fontFamily = font;
+      }
+    }
+
+    function changeColor(color) {
+      const selectedText = document.querySelector('.element div[contentEditable="true"]');
+      if (selectedText) {
+        selectedText.style.color = color;
+      }
+    }
+
+    function undo() {
+      if (undoStack.length > 0) {
+        redoStack.push(currentState);
+        currentState = undoStack.pop();
+        restoreState();
+      }
+    }
+
+    function redo() {
+      if (redoStack.length > 0) {
+        undoStack.push(currentState);
+        currentState = redoStack.pop();
+        restoreState();
+      }
+    }
+
+    function saveState() {
+      undoStack.push(currentState);
+      redoStack = [];
+      currentState = document.getElementById('canvas').innerHTML;
+    }
+
+    function restoreState() {
+      document.getElementById('canvas').innerHTML = currentState;
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>
