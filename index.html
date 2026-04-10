@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obtain Finance — Mortgage Brokers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: '#0A1628', light: '#112240', mid: '#1a3a6b' },
+            amber: { DEFAULT: '#F59E0B', dark: '#D97706', light: '#FCD34D' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Playfair Display', 'serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; }
+    .nav-scrolled { background-color: rgba(10, 22, 40, 0.97) !important; backdrop-filter: blur(12px); box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+    .gradient-text { background: linear-gradient(135deg, #F59E0B, #FCD34D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-bg { background: radial-gradient(ellipse at 70% 50%, #1a3a6b 0%, #0A1628 60%); }
+    .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; }
+    .faq-answer.open { max-height: 300px; }
+    .faq-icon { transition: transform 0.3s ease; }
+    .faq-icon.open { transform: rotate(45deg); }
+    .stat-divider::before { content: '|'; color: #F59E0B; margin: 0 1rem; opacity: 0.5; }
+    .step-line::after { content: ''; position: absolute; top: 2rem; left: calc(50% + 2rem); width: calc(100% - 4rem); height: 2px; background: linear-gradient(90deg, #F59E0B, transparent); }
+    input[type=range] { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; background: #1a3a6b; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #F59E0B; cursor: pointer; box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+    .mobile-menu { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .mobile-menu.open { max-height: 400px; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+    .float-anim { animation: float 4s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-white text-slate-800">
+
+<!-- ═══════════════════════ NAVIGATION ═══════════════════════ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#home" class="flex items-center gap-2">
+        <div class="w-9 h-9 bg-amber rounded-lg flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 8V18H13V13H7V18H2V8L10 2Z" fill="#0A1628"/></svg>
+        </div>
+        <span class="text-white font-bold text-xl"><span class="text-amber">Obtain</span> Finance</span>
+      </a>
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#services" class="text-slate-300 hover:text-amber transition-colors text-sm font-medium">Services</a>
+        <a href="#how-it-works" class="text-slate-300 hover:text-amber transition-colors text-sm font-medium">How It Works</a>
+        <a href="#calculator" class="text-slate-300 hover:text-amber transition-colors text-sm font-medium">Calculator</a>
+        <a href="#about" class="text-slate-300 hover:text-amber transition-colors text-sm font-medium">About</a>
+        <a href="#contact" class="bg-amber hover:bg-amber-dark text-navy font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">Get Started</a>
+      </div>
+      <!-- Mobile Hamburger -->
+      <button id="hamburger" class="md:hidden text-white focus:outline-none" onclick="toggleMenu()">
+        <svg id="ham-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu md:hidden">
+      <div class="pt-4 pb-2 flex flex-col gap-1">
+        <a href="#services" class="text-slate-300 hover:text-amber py-2 px-2 rounded text-sm font-medium" onclick="toggleMenu()">Services</a>
+        <a href="#how-it-works" class="text-slate-300 hover:text-amber py-2 px-2 rounded text-sm font-medium" onclick="toggleMenu()">How It Works</a>
+        <a href="#calculator" class="text-slate-300 hover:text-amber py-2 px-2 rounded text-sm font-medium" onclick="toggleMenu()">Calculator</a>
+        <a href="#about" class="text-slate-300 hover:text-amber py-2 px-2 rounded text-sm font-medium" onclick="toggleMenu()">About</a>
+        <a href="#contact" class="bg-amber text-navy font-semibold text-sm px-4 py-2.5 rounded-lg mt-2 text-center" onclick="toggleMenu()">Get Started</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section id="home" class="hero-bg min-h-screen flex items-center pt-20 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <div class="grid lg:grid-cols-2 gap-12 items-center py-16">
+      <!-- Left -->
+      <div data-aos="fade-right" data-aos-duration="800">
+        <div class="inline-flex items-center gap-2 bg-navy-light border border-amber/20 text-amber text-sm font-medium px-4 py-2 rounded-full mb-6">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.5 3 3.5.5-2.5 2.5.5 3.5L8 9l-3 1.5.5-3.5L3 4.5l3.5-.5L8 1z"/></svg>
+          Trusted Mortgage Brokers — Australia
+        </div>
+        <h1 class="font-display text-5xl lg:text-6xl text-white leading-tight mb-6">
+          Your Dream Home<br><span class="gradient-text">Starts Here</span>
+        </h1>
+        <p class="text-slate-300 text-lg leading-relaxed mb-8 max-w-lg">
+          Obtain Finance compares hundreds of loan options from 40+ lenders to find you the best rate. Expert guidance, zero broker fees, fast approvals.
+        </p>
+        <div class="flex flex-wrap gap-4 mb-12">
+          <a href="#contact" class="bg-amber hover:bg-amber-dark text-navy font-bold px-8 py-4 rounded-xl transition-all hover:shadow-lg hover:shadow-amber/30 text-base">
+            Get a Free Consultation
+          </a>
+          <a href="#how-it-works" class="border border-white/30 hover:border-amber text-white hover:text-amber font-semibold px-8 py-4 rounded-xl transition-all text-base">
+            See How It Works
+          </a>
+        </div>
+        <!-- Stats -->
+        <div class="flex flex-wrap gap-6 pt-8 border-t border-white/10">
+          <div class="text-center">
+            <div class="text-amber font-bold text-2xl">500+</div>
+            <div class="text-slate-400 text-xs mt-1">Loans Settled</div>
+          </div>
+          <div class="text-center">
+            <div class="text-amber font-bold text-2xl">4.9★</div>
+            <div class="text-slate-400 text-xs mt-1">Client Rating</div>
+          </div>
+          <div class="text-center">
+            <div class="text-amber font-bold text-2xl">40+</div>
+            <div class="text-slate-400 text-xs mt-1">Lenders</div>
+          </div>
+          <div class="text-center">
+            <div class="text-amber font-bold text-2xl">$200M+</div>
+            <div class="text-slate-400 text-xs mt-1">Loans Funded</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right — Visual -->
+      <div data-aos="fade-left" data-aos-duration="800" data-aos-delay="200" class="hidden lg:flex justify-center items-center">
+        <div class="relative">
+          <!-- Glow -->
+          <div class="absolute inset-0 bg-amber/10 rounded-3xl blur-3xl scale-110"></div>
+          <!-- Card stack visual -->
+          <div class="relative float-anim">
+            <div class="bg-navy-light border border-white/10 rounded-2xl p-8 shadow-2xl w-80">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <p class="text-slate-400 text-xs">Monthly Repayment</p>
+                  <p class="text-white text-3xl font-bold mt-1">$2,998</p>
+                </div>
+                <div class="w-12 h-12 bg-amber/20 rounded-xl flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <div class="flex justify-between text-sm"><span class="text-slate-400">Loan Amount</span><span class="text-white font-medium">$500,000</span></div>
+                <div class="flex justify-between text-sm"><span class="text-slate-400">Interest Rate</span><span class="text-amber font-medium">6.00% p.a.</span></div>
+                <div class="flex justify-between text-sm"><span class="text-slate-400">Loan Term</span><span class="text-white font-medium">30 years</span></div>
+                <div class="h-px bg-white/10 my-3"></div>
+                <div class="flex justify-between text-sm"><span class="text-slate-400">Lender</span><span class="text-white font-medium">Best Rate Found ✓</span></div>
+              </div>
+              <div class="mt-6 bg-amber/10 border border-amber/20 rounded-xl p-3 text-center">
+                <span class="text-amber text-sm font-semibold">Pre-approval ready in 24hrs</span>
+              </div>
+            </div>
+          </div>
+          <!-- Floating badge -->
+          <div class="absolute -top-4 -right-4 bg-green-500 text-white text-xs font-bold px-3 py-2 rounded-full shadow-lg">
+            Approved ✓
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Wave divider -->
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0 60V30C240 0 480 60 720 30C960 0 1200 60 1440 30V60H0Z" fill="white"/></svg>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SERVICES ═══════════════════════ -->
+<section id="services" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">What We Offer</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-navy mb-4">Loan Solutions for Every Goal</h2>
+      <p class="text-slate-500 max-w-xl mx-auto text-lg">Whether you're buying your first home, investing, or refinancing — we have the right solution for you.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Service cards -->
+      <div class="card-hover bg-white border border-slate-100 rounded-2xl p-8 shadow-sm" data-aos="fade-up" data-aos-delay="0">
+        <div class="w-14 h-14 bg-amber/10 rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <h3 class="font-display text-xl text-navy mb-2">Home Loans</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Find competitive owner-occupier rates with flexible repayment options tailored to your lifestyle and budget.</p>
+        <a href="#contact" class="inline-flex items-center gap-1 text-amber font-semibold text-sm mt-4 hover:gap-2 transition-all">Enquire Now <span>→</span></a>
+      </div>
+      <div class="card-hover bg-white border border-slate-100 rounded-2xl p-8 shadow-sm" data-aos="fade-up" data-aos-delay="80">
+        <div class="w-14 h-14 bg-amber/10 rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        </div>
+        <h3 class="font-display text-xl text-navy mb-2">Refinancing</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Switch to a better rate and save thousands. We'll handle the entire refinancing process from start to finish.</p>
+        <a href="#contact" class="inline-flex items-center gap-1 text-amber font-semibold text-sm mt-4 hover:gap-2 transition-all">Enquire Now <span>→</span></a>
+      </div>
+      <div class="card-hover bg-white border border-slate-100 rounded-2xl p-8 shadow-sm" data-aos="fade-up" data-aos-delay="160">
+        <div class="w-14 h-14 bg-amber/10 rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        </div>
+        <h3 class="font-display text-xl text-navy mb-2">Investment Loans</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Grow your property portfolio with investor-specific loan structures, interest-only options, and competitive rates.</p>
+        <a href="#contact" class="inline-flex items-center gap-1 text-amber font-semibold text-sm mt-4 hover:gap-2 transition-all">Enquire Now <span>→</span></a>
+      </div>
+      <div class="card-hover bg-white border border-slate-100 rounded-2xl p-8 shadow-sm" data-aos="fade-up" data-aos-delay="0">
+        <div class="w-14 h-14 bg-amber/10 rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h3 class="font-display text-xl text-navy mb-2">First Home Buyers</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Navigate government grants, stamp duty concessions, and LMI waivers. We make your first purchase stress-free.</p>
+        <a href="#contact" class="inline-flex items-center gap-1 text-amber font-semibold text-sm mt-4 hover:gap-2 transition-all">Enquire Now <span>→</span></a>
+      </div>
+      <div class="card-hover bg-white border border-slate-100 rounded-2xl p-8 shadow-sm" data-aos="fade-up" data-aos-delay="80">
+        <div class="w-14 h-14 bg-amber/10 rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        </div>
+        <h3 class="font-display text-xl text-navy mb-2">Commercial Finance</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Business property, development finance, and commercial loans structured around your business strategy.</p>
+        <a href="#contact" class="inline-flex items-center gap-1 text-amber font-semibold text-sm mt-4 hover:gap-2 transition-all">Enquire Now <span>→</span></a>
+      </div>
+      <div class="card-hover bg-white border border-slate-100 rounded-2xl p-8 shadow-sm" data-aos="fade-up" data-aos-delay="160">
+        <div class="w-14 h-14 bg-amber/10 rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 class="font-display text-xl text-navy mb-2">SMSF Loans</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Purchase property through your self-managed super fund with compliant limited recourse borrowing arrangements.</p>
+        <a href="#contact" class="inline-flex items-center gap-1 text-amber font-semibold text-sm mt-4 hover:gap-2 transition-all">Enquire Now <span>→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ WHY CHOOSE US ═══════════════════════ -->
+<section id="why-us" class="py-24 bg-navy">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div data-aos="fade-right">
+        <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">Why Obtain Finance</p>
+        <h2 class="font-display text-4xl lg:text-5xl text-white mb-6">The Smart Way to Find Your Loan</h2>
+        <p class="text-slate-300 text-lg leading-relaxed mb-10">We work for you, not the banks. Our independent brokers search across dozens of lenders to find a loan that genuinely fits your situation — saving you time, money, and stress.</p>
+        <div class="space-y-6">
+          <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-amber/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div>
+              <h4 class="text-white font-semibold text-lg mb-1">Access to 40+ Lenders</h4>
+              <p class="text-slate-400 text-sm leading-relaxed">We compare the big banks, challenger banks, and specialist lenders to find you the best deal available.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-amber/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <h4 class="text-white font-semibold text-lg mb-1">Zero Broker Fees</h4>
+              <p class="text-slate-400 text-sm leading-relaxed">Our service is completely free to you. We're paid by the lender when your loan settles — no hidden costs.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-amber/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div>
+              <h4 class="text-white font-semibold text-lg mb-1">Dedicated Expert Advice</h4>
+              <p class="text-slate-400 text-sm leading-relaxed">Your personal broker guides you from enquiry to settlement and beyond — always available when you need them.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-12 h-12 bg-amber/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+              <h4 class="text-white font-semibold text-lg mb-1">Fast Pre-Approvals</h4>
+              <p class="text-slate-400 text-sm leading-relaxed">Get pre-approved in as little as 24 hours so you can make an offer with confidence at auction or private sale.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Lender logos / visual -->
+      <div data-aos="fade-left" data-aos-delay="200" class="flex flex-col gap-6">
+        <div class="bg-navy-light border border-white/10 rounded-2xl p-8">
+          <p class="text-slate-400 text-sm mb-5 font-medium">Some of our lending partners</p>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">ANZ</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">Westpac</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">NAB</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">CBA</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">ING</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">Macquarie</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">St George</div>
+            <div class="bg-white/5 rounded-xl p-4 text-center text-slate-300 text-sm font-semibold">Suncorp</div>
+            <div class="bg-amber/20 border border-amber/30 rounded-xl p-4 text-center text-amber text-sm font-semibold">+32 more</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-navy-light border border-white/10 rounded-2xl p-6 text-center">
+            <div class="text-amber text-3xl font-bold mb-1">98%</div>
+            <div class="text-slate-400 text-sm">Approval Rate</div>
+          </div>
+          <div class="bg-navy-light border border-white/10 rounded-2xl p-6 text-center">
+            <div class="text-amber text-3xl font-bold mb-1">24hr</div>
+            <div class="text-slate-400 text-sm">Pre-Approval</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
+<section id="how-it-works" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">Simple Process</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-navy mb-4">From Enquiry to Keys</h2>
+      <p class="text-slate-500 max-w-lg mx-auto text-lg">Three simple steps to securing your ideal home loan.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 relative">
+      <!-- Connecting line (desktop) -->
+      <div class="hidden md:block absolute top-16 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-amber/40 via-amber to-amber/40" style="width:50%;left:25%"></div>
+      <!-- Step 1 -->
+      <div class="text-center relative" data-aos="fade-up" data-aos-delay="0">
+        <div class="w-16 h-16 bg-amber rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-lg shadow-amber/30">
+          <span class="text-navy font-bold text-xl">1</span>
+        </div>
+        <h3 class="font-display text-2xl text-navy mb-3">Book a Consultation</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Tell us about your goals — whether you're buying, refinancing, or investing. Free, no-obligation consultation at a time that suits you.</p>
+      </div>
+      <!-- Step 2 -->
+      <div class="text-center relative" data-aos="fade-up" data-aos-delay="150">
+        <div class="w-16 h-16 bg-navy flex items-center justify-center mx-auto mb-6 relative z-10 rounded-2xl border-2 border-amber shadow-lg">
+          <span class="text-amber font-bold text-xl">2</span>
+        </div>
+        <h3 class="font-display text-2xl text-navy mb-3">Compare &amp; Choose</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">We research and compare loan products from 40+ lenders, present your best options, and manage the entire application process.</p>
+      </div>
+      <!-- Step 3 -->
+      <div class="text-center relative" data-aos="fade-up" data-aos-delay="300">
+        <div class="w-16 h-16 bg-amber rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-lg shadow-amber/30">
+          <span class="text-navy font-bold text-xl">3</span>
+        </div>
+        <h3 class="font-display text-2xl text-navy mb-3">Settle &amp; Celebrate</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">We liaise with your conveyancer, real estate agent, and lender to ensure a smooth settlement. Then celebrate — you're a homeowner!</p>
+      </div>
+    </div>
+    <div class="text-center mt-14" data-aos="fade-up">
+      <a href="#contact" class="bg-amber hover:bg-amber-dark text-navy font-bold px-10 py-4 rounded-xl transition-all hover:shadow-lg hover:shadow-amber/30 text-base inline-block">Start Your Journey Today</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ CALCULATOR ═══════════════════════ -->
+<section id="calculator" class="py-24 bg-navy overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14" data-aos="fade-up">
+      <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">Repayment Calculator</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-white mb-4">How Much Will It Cost?</h2>
+      <p class="text-slate-300 max-w-lg mx-auto text-lg">Get an instant repayment estimate — then let us find you an even better rate.</p>
+    </div>
+    <div class="max-w-4xl mx-auto bg-navy-light border border-white/10 rounded-3xl p-8 lg:p-12" data-aos="fade-up" data-aos-delay="100">
+      <div class="grid lg:grid-cols-2 gap-12 items-start">
+        <!-- Inputs -->
+        <div class="space-y-8">
+          <!-- Loan Amount -->
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-slate-300 font-medium text-sm">Loan Amount</label>
+              <div class="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
+                <span class="text-amber text-sm font-bold">$</span>
+                <input type="number" id="calc-amount" value="500000" min="50000" max="5000000" step="10000"
+                  class="bg-transparent text-white font-bold text-sm w-24 text-right focus:outline-none" oninput="syncSlider('amount')">
+              </div>
+            </div>
+            <input type="range" id="calc-amount-range" min="50000" max="3000000" step="10000" value="500000" oninput="syncInput('amount')" class="w-full">
+            <div class="flex justify-between text-slate-500 text-xs mt-1"><span>$50k</span><span>$3M</span></div>
+          </div>
+          <!-- Interest Rate -->
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-slate-300 font-medium text-sm">Interest Rate (p.a.)</label>
+              <div class="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
+                <input type="number" id="calc-rate" value="6.00" min="1" max="15" step="0.05"
+                  class="bg-transparent text-white font-bold text-sm w-16 text-right focus:outline-none" oninput="syncSlider('rate')">
+                <span class="text-amber text-sm font-bold">%</span>
+              </div>
+            </div>
+            <input type="range" id="calc-rate-range" min="1" max="15" step="0.05" value="6.00" oninput="syncInput('rate')" class="w-full">
+            <div class="flex justify-between text-slate-500 text-xs mt-1"><span>1%</span><span>15%</span></div>
+          </div>
+          <!-- Loan Term -->
+          <div>
+            <label class="text-slate-300 font-medium text-sm block mb-3">Loan Term</label>
+            <select id="calc-term" onchange="calculate()" class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-amber/50 text-sm">
+              <option value="10">10 years</option>
+              <option value="15">15 years</option>
+              <option value="20">20 years</option>
+              <option value="25">25 years</option>
+              <option value="30" selected>30 years</option>
+            </select>
+          </div>
+        </div>
+        <!-- Results -->
+        <div class="space-y-5">
+          <div class="bg-amber/10 border border-amber/20 rounded-2xl p-6 text-center">
+            <p class="text-slate-400 text-sm mb-1">Monthly Repayment</p>
+            <p id="calc-monthly" class="text-amber text-5xl font-bold font-display">$2,998</p>
+            <p class="text-slate-500 text-xs mt-2">Principal &amp; Interest</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+              <p class="text-slate-400 text-xs mb-1">Total Repayment</p>
+              <p id="calc-total" class="text-white font-bold text-lg">$1,079,191</p>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+              <p class="text-slate-400 text-xs mb-1">Total Interest</p>
+              <p id="calc-interest" class="text-white font-bold text-lg">$579,191</p>
+            </div>
+          </div>
+          <p class="text-slate-500 text-xs text-center leading-relaxed">* Indicative estimate only. Rates vary by lender, LVR, and borrower profile.</p>
+          <a href="#contact" class="block text-center bg-amber hover:bg-amber-dark text-navy font-bold py-4 rounded-xl transition-all hover:shadow-lg hover:shadow-amber/30">
+            Get Your Personalised Rate →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ TESTIMONIALS ═══════════════════════ -->
+<section id="testimonials" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16" data-aos="fade-up">
+      <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">Client Stories</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-navy mb-4">What Our Clients Say</h2>
+      <p class="text-slate-500 max-w-lg mx-auto text-lg">Real results for real Australians. Here's what our clients have to say.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Testimonial 1 -->
+      <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100 card-hover" data-aos="fade-up" data-aos-delay="0">
+        <div class="flex gap-1 mb-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="text-slate-600 italic leading-relaxed mb-6">"Obtain Finance saved us over $12,000 in interest by finding a rate 0.6% lower than what our bank offered. The whole process took less than 2 weeks. Couldn't be happier."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 bg-navy rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">JS</div>
+          <div>
+            <p class="text-navy font-semibold text-sm">James &amp; Sarah K.</p>
+            <p class="text-amber text-xs font-medium">Home Loan — Mosman, NSW</p>
+          </div>
+        </div>
+      </div>
+      <!-- Testimonial 2 -->
+      <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100 card-hover" data-aos="fade-up" data-aos-delay="120">
+        <div class="flex gap-1 mb-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="text-slate-600 italic leading-relaxed mb-6">"As a first home buyer I had no idea where to start. The team at Obtain Finance walked me through everything — the FHOG, stamp duty savings, and got me pre-approved in under 24 hours. Absolutely outstanding service."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 bg-amber rounded-full flex items-center justify-center text-navy font-bold text-sm flex-shrink-0">MT</div>
+          <div>
+            <p class="text-navy font-semibold text-sm">Megan T.</p>
+            <p class="text-amber text-xs font-medium">First Home Buyer — Richmond, VIC</p>
+          </div>
+        </div>
+      </div>
+      <!-- Testimonial 3 -->
+      <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100 card-hover" data-aos="fade-up" data-aos-delay="240">
+        <div class="flex gap-1 mb-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="text-slate-600 italic leading-relaxed mb-6">"I refinanced my investment portfolio — 3 properties — through Obtain Finance. They handled everything end-to-end, saved me $820/month across all three, and the service was professional throughout. Highly recommended."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 bg-navy-mid rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">DR</div>
+          <div>
+            <p class="text-navy font-semibold text-sm">David R.</p>
+            <p class="text-amber text-xs font-medium">Investment Loans — Brisbane, QLD</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ ABOUT ═══════════════════════ -->
+<section id="about" class="py-24 bg-navy">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Visual / Profile -->
+      <div data-aos="fade-right" class="flex justify-center lg:justify-start">
+        <div class="relative">
+          <!-- Decorative ring -->
+          <div class="absolute -inset-4 rounded-3xl border border-amber/20"></div>
+          <div class="absolute -inset-8 rounded-3xl border border-amber/10"></div>
+          <!-- Profile card -->
+          <div class="bg-navy-light border border-white/10 rounded-2xl p-8 relative z-10 max-w-sm">
+            <!-- Avatar -->
+            <div class="w-24 h-24 bg-gradient-to-br from-amber to-amber-dark rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber/30">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="18" r="9" fill="#0A1628"/><path d="M8 40c0-8.837 7.163-16 16-16s16 7.163 16 16" stroke="#0A1628" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="text-white text-xl font-bold text-center mb-1">Your Broker Name</h3>
+            <p class="text-amber text-sm text-center mb-4">Senior Mortgage Broker</p>
+            <p class="text-slate-400 text-sm text-center leading-relaxed mb-6">10+ years experience helping Australians find their ideal home loan solution.</p>
+            <!-- Credential badges -->
+            <div class="flex flex-wrap gap-2 justify-center">
+              <span class="bg-amber/10 border border-amber/20 text-amber text-xs font-semibold px-3 py-1.5 rounded-full">MFAA Member</span>
+              <span class="bg-amber/10 border border-amber/20 text-amber text-xs font-semibold px-3 py-1.5 rounded-full">ASIC Authorised</span>
+              <span class="bg-amber/10 border border-amber/20 text-amber text-xs font-semibold px-3 py-1.5 rounded-full">FBAA Member</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Text -->
+      <div data-aos="fade-left" data-aos-delay="150">
+        <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">About Us</p>
+        <h2 class="font-display text-4xl lg:text-5xl text-white mb-6">Finance Made<br>Simple &amp; Personal</h2>
+        <div class="space-y-4 text-slate-300 leading-relaxed">
+          <p>Obtain Finance was founded on a simple belief: every Australian deserves access to expert, unbiased mortgage advice — not just the deal that's easiest for the bank.</p>
+          <p>We're an independent mortgage broking business with access to a panel of 40+ lenders. We take the time to understand your situation, your goals, and your future plans — then find a loan structure that genuinely works for you.</p>
+          <p>Whether you're buying your first home, growing your investment portfolio, or looking to save on your existing mortgage, we're with you every step of the way.</p>
+        </div>
+        <div class="mt-8 grid grid-cols-2 gap-4">
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div class="text-amber font-bold text-2xl">10+</div>
+            <div class="text-slate-400 text-sm mt-1">Years Experience</div>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div class="text-amber font-bold text-2xl">500+</div>
+            <div class="text-slate-400 text-sm mt-1">Happy Clients</div>
+          </div>
+        </div>
+        <a href="#contact" class="inline-block mt-8 bg-amber hover:bg-amber-dark text-navy font-bold px-8 py-4 rounded-xl transition-all hover:shadow-lg hover:shadow-amber/30">Get in Touch</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FAQ ═══════════════════════ -->
+<section id="faq" class="py-24 bg-slate-50">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14" data-aos="fade-up">
+      <p class="text-amber font-semibold text-sm uppercase tracking-widest mb-3">FAQ</p>
+      <h2 class="font-display text-4xl lg:text-5xl text-navy mb-4">Common Questions</h2>
+      <p class="text-slate-500 text-lg">Everything you need to know about working with a mortgage broker.</p>
+    </div>
+    <div class="space-y-3" data-aos="fade-up" data-aos-delay="100">
+      <!-- FAQ items -->
+      <div class="faq-item bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+        <button class="faq-trigger w-full text-left px-6 py-5 flex justify-between items-center gap-4">
+          <span class="font-semibold text-navy text-sm leading-snug">What does a mortgage broker actually do?</span>
+          <span class="faq-icon text-amber text-2xl font-light flex-shrink-0 leading-none">+</span>
+        </button>
+        <div class="faq-answer px-6 text-slate-500 text-sm leading-relaxed">
+          A mortgage broker acts as the intermediary between you and lenders. Instead of going directly to one bank, we search across our entire panel to find the most suitable loan product for your needs. We handle the research, paperwork, and negotiation — you just make the decision.
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+        <button class="faq-trigger w-full text-left px-6 py-5 flex justify-between items-center gap-4">
+          <span class="font-semibold text-navy text-sm leading-snug">How much does your service cost?</span>
+          <span class="faq-icon text-amber text-2xl font-light flex-shrink-0 leading-none">+</span>
+        </button>
+        <div class="faq-answer px-6 text-slate-500 text-sm leading-relaxed">
+          Our broking service is completely free to you. We receive a commission from the lender when your loan settles. We are legally required to act in your best interests regardless — this is enforced by ASIC's Best Interests Duty legislation. We'll always disclose our commission upfront.
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+        <button class="faq-trigger w-full text-left px-6 py-5 flex justify-between items-center gap-4">
+          <span class="font-semibold text-navy text-sm leading-snug">How long does approval take?</span>
+          <span class="faq-icon text-amber text-2xl font-light flex-shrink-0 leading-none">+</span>
+        </button>
+        <div class="faq-answer px-6 text-slate-500 text-sm leading-relaxed">
+          Pre-approval can typically be obtained in 24–48 hours once we have all your documents. Full formal approval generally takes 3–7 business days depending on the lender. We'll keep you informed at every stage and chase the lender proactively on your behalf.
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+        <button class="faq-trigger w-full text-left px-6 py-5 flex justify-between items-center gap-4">
+          <span class="font-semibold text-navy text-sm leading-snug">How many lenders do you have access to?</span>
+          <span class="faq-icon text-amber text-2xl font-light flex-shrink-0 leading-none">+</span>
+        </button>
+        <div class="faq-answer px-6 text-slate-500 text-sm leading-relaxed">
+          We have access to 40+ lenders including all major banks (ANZ, CBA, NAB, Westpac), mid-tier banks (ING, Macquarie, Suncorp, St George), and specialist/non-bank lenders. This breadth means we can almost always find a competitive option even for complex situations.
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+        <button class="faq-trigger w-full text-left px-6 py-5 flex justify-between items-center gap-4">
+          <span class="font-semibold text-navy text-sm leading-snug">Can you help if I have bad credit or am self-employed?</span>
+          <span class="faq-icon text-amber text-2xl font-light flex-shrink-0 leading-none">+</span>
+        </button>
+        <div class="faq-answer px-6 text-slate-500 text-sm leading-relaxed">
+          Yes. We have access to specialist lenders who cater to self-employed borrowers (including those with alt-doc options) and borrowers with impaired credit history. Every situation is different — book a free consultation and we'll assess what's achievable for you.
+        </div>
+      </div>
+      <div class="faq-item bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+        <button class="faq-trigger w-full text-left px-6 py-5 flex justify-between items-center gap-4">
+          <span class="font-semibold text-navy text-sm leading-snug">What documents do I need to get started?</span>
+          <span class="faq-icon text-amber text-2xl font-light flex-shrink-0 leading-none">+</span>
+        </button>
+        <div class="faq-answer px-6 text-slate-500 text-sm leading-relaxed">
+          Typically you'll need: 2 recent payslips (or last 2 years tax returns if self-employed), last 3 months bank statements, photo ID, and details of any existing debts or assets. We'll give you a personalised checklist after your initial consultation so nothing is missed.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ CTA BANNER + CONTACT ═══════════════════════ -->
+<section id="contact" class="bg-navy">
+  <!-- CTA Banner -->
+  <div class="py-20 border-b border-white/10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="zoom-in">
+      <div class="inline-flex items-center gap-2 bg-amber/10 border border-amber/20 text-amber text-sm font-semibold px-5 py-2.5 rounded-full mb-8">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.5 3 3.5.5-2.5 2.5.5 3.5L8 9l-3 1.5.5-3.5L3 4.5l3.5-.5L8 1z"/></svg>
+        Free Consultation — No Obligation
+      </div>
+      <h2 class="font-display text-4xl lg:text-6xl text-white mb-6">Ready to Find Your<br><span class="gradient-text">Perfect Loan?</span></h2>
+      <p class="text-slate-300 text-xl max-w-xl mx-auto">Let's talk. A 15-minute chat could save you thousands over the life of your loan.</p>
+    </div>
+  </div>
+
+  <!-- Contact Form -->
+  <div class="py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-5 gap-12">
+        <!-- Contact Details (2/5) -->
+        <div class="lg:col-span-2" data-aos="fade-right">
+          <h3 class="font-display text-2xl text-white mb-6">Get in Touch</h3>
+          <div class="space-y-5">
+            <div class="flex gap-4 items-start">
+              <div class="w-10 h-10 bg-amber/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18C0 .08.91-.02 2 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </div>
+              <div>
+                <p class="text-slate-400 text-xs mb-1">Phone</p>
+                <p class="text-white font-medium">1300 000 000</p>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="w-10 h-10 bg-amber/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <p class="text-slate-400 text-xs mb-1">Email</p>
+                <p class="text-white font-medium">hello@obtainfinance.com.au</p>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="w-10 h-10 bg-amber/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <p class="text-slate-400 text-xs mb-1">Office</p>
+                <p class="text-white font-medium">Sydney, NSW 2000<br><span class="text-slate-400 text-sm">Appointments Australia-wide</span></p>
+              </div>
+            </div>
+          </div>
+          <!-- Social links -->
+          <div class="mt-8">
+            <p class="text-slate-400 text-sm mb-4">Follow us</p>
+            <div class="flex gap-3">
+              <a href="#" class="w-10 h-10 bg-white/5 hover:bg-amber/20 border border-white/10 hover:border-amber/30 rounded-xl flex items-center justify-center transition-all" aria-label="LinkedIn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#9ca3af"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+              </a>
+              <a href="#" class="w-10 h-10 bg-white/5 hover:bg-amber/20 border border-white/10 hover:border-amber/30 rounded-xl flex items-center justify-center transition-all" aria-label="Facebook">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#9ca3af"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+              </a>
+              <a href="#" class="w-10 h-10 bg-white/5 hover:bg-amber/20 border border-white/10 hover:border-amber/30 rounded-xl flex items-center justify-center transition-all" aria-label="Instagram">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- Form (3/5) -->
+        <div class="lg:col-span-3" data-aos="fade-left" data-aos-delay="150">
+          <div class="bg-navy-light border border-white/10 rounded-2xl p-8">
+            <h3 class="font-display text-xl text-white mb-6">Send Us a Message</h3>
+            <form id="contact-form" novalidate>
+              <div class="grid sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label class="text-slate-400 text-xs font-medium block mb-2">Full Name *</label>
+                  <input type="text" name="name" required placeholder="John Smith"
+                    class="w-full bg-white/5 border border-white/10 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber/50 transition-colors">
+                </div>
+                <div>
+                  <label class="text-slate-400 text-xs font-medium block mb-2">Phone *</label>
+                  <input type="tel" name="phone" required placeholder="0400 000 000"
+                    class="w-full bg-white/5 border border-white/10 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber/50 transition-colors">
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="text-slate-400 text-xs font-medium block mb-2">Email Address *</label>
+                <input type="email" name="email" required placeholder="john@example.com"
+                  class="w-full bg-white/5 border border-white/10 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber/50 transition-colors">
+              </div>
+              <div class="mb-4">
+                <label class="text-slate-400 text-xs font-medium block mb-2">I'm looking for…</label>
+                <select name="loan_type"
+                  class="w-full bg-white/5 border border-white/10 text-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber/50 transition-colors">
+                  <option value="">Select loan type</option>
+                  <option>Home Loan</option>
+                  <option>Refinancing</option>
+                  <option>Investment Loan</option>
+                  <option>First Home Buyer</option>
+                  <option>Commercial Finance</option>
+                  <option>SMSF Loan</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+              <div class="mb-6">
+                <label class="text-slate-400 text-xs font-medium block mb-2">Message</label>
+                <textarea name="message" rows="4" placeholder="Tell us a bit about your situation…"
+                  class="w-full bg-white/5 border border-white/10 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber/50 transition-colors resize-none"></textarea>
+              </div>
+              <button type="submit"
+                class="w-full bg-amber hover:bg-amber-dark text-navy font-bold py-4 rounded-xl transition-all hover:shadow-lg hover:shadow-amber/30 text-base">
+                Send Message →
+              </button>
+            </form>
+            <!-- Success message (hidden by default) -->
+            <div id="form-success" class="hidden mt-4 bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
+              <p class="text-green-400 font-semibold text-sm">Thanks! We'll be in touch within 24 hours. ✓</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="bg-[#060E1A] pt-16 pb-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+      <!-- Brand -->
+      <div class="md:col-span-1">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 bg-amber rounded-lg flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 8V18H13V13H7V18H2V8L10 2Z" fill="#0A1628"/></svg>
+          </div>
+          <span class="text-white font-bold text-lg"><span class="text-amber">Obtain</span> Finance</span>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed">Your trusted mortgage broking partner. We make home ownership and property investment accessible to every Australian.</p>
+      </div>
+      <!-- Services -->
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Services</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#services" class="text-slate-400 hover:text-amber text-sm transition-colors">Home Loans</a></li>
+          <li><a href="#services" class="text-slate-400 hover:text-amber text-sm transition-colors">Refinancing</a></li>
+          <li><a href="#services" class="text-slate-400 hover:text-amber text-sm transition-colors">Investment Loans</a></li>
+          <li><a href="#services" class="text-slate-400 hover:text-amber text-sm transition-colors">First Home Buyers</a></li>
+          <li><a href="#services" class="text-slate-400 hover:text-amber text-sm transition-colors">Commercial Finance</a></li>
+          <li><a href="#services" class="text-slate-400 hover:text-amber text-sm transition-colors">SMSF Loans</a></li>
+        </ul>
+      </div>
+      <!-- Company -->
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Company</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#about" class="text-slate-400 hover:text-amber text-sm transition-colors">About Us</a></li>
+          <li><a href="#how-it-works" class="text-slate-400 hover:text-amber text-sm transition-colors">How It Works</a></li>
+          <li><a href="#calculator" class="text-slate-400 hover:text-amber text-sm transition-colors">Calculator</a></li>
+          <li><a href="#faq" class="text-slate-400 hover:text-amber text-sm transition-colors">FAQ</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-amber text-sm transition-colors">Privacy Policy</a></li>
+          <li><a href="#" class="text-slate-400 hover:text-amber text-sm transition-colors">Terms of Service</a></li>
+        </ul>
+      </div>
+      <!-- Contact -->
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Contact</h4>
+        <ul class="space-y-2.5">
+          <li class="text-slate-400 text-sm">1300 000 000</li>
+          <li class="text-slate-400 text-sm">hello@obtainfinance.com.au</li>
+          <li class="text-slate-400 text-sm">Sydney, NSW 2000</li>
+        </ul>
+        <a href="#contact" class="inline-block mt-6 bg-amber hover:bg-amber-dark text-navy font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">Book a Call</a>
+      </div>
+    </div>
+    <!-- Legal / bottom bar -->
+    <div class="pt-8 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+      <p class="text-slate-600 text-xs leading-relaxed max-w-2xl">
+        Obtain Finance Pty Ltd | Australian Credit Licence [XXXXXXX] | Credit Representative [XXXXXX]. This website provides general information only and does not constitute financial advice. Credit products are subject to lender approval. Always consider your personal circumstances before making financial decisions.
+      </p>
+      <p class="text-slate-600 text-xs flex-shrink-0">© 2025 Obtain Finance. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // ── AOS Init ──────────────────────────────────────────────
+  AOS.init({ once: true, duration: 700, easing: 'ease-out-cubic', offset: 60 });
+
+  // ── Navbar scroll effect ──────────────────────────────────
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.classList.add('nav-scrolled');
+    } else {
+      navbar.classList.remove('nav-scrolled');
+    }
+  });
+
+  // ── Mobile menu toggle ────────────────────────────────────
+  function toggleMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('open');
+  }
+
+  // ── FAQ Accordion ─────────────────────────────────────────
+  document.querySelectorAll('.faq-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answer = btn.nextElementSibling;
+      const icon = btn.querySelector('.faq-icon');
+      const isOpen = answer.classList.contains('open');
+
+      // Close all
+      document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+      document.querySelectorAll('.faq-icon').forEach(i => {
+        i.textContent = '+';
+        i.classList.remove('open');
+      });
+
+      // Open the clicked one (if it wasn't open)
+      if (!isOpen) {
+        answer.classList.add('open');
+        icon.textContent = '×';
+        icon.classList.add('open');
+      }
+    });
+  });
+
+  // ── Loan Calculator ───────────────────────────────────────
+  function syncInput(field) {
+    const range = document.getElementById('calc-' + field + '-range');
+    const input = document.getElementById('calc-' + field);
+    input.value = field === 'rate' ? parseFloat(range.value).toFixed(2) : range.value;
+    calculate();
+  }
+
+  function syncSlider(field) {
+    const input = document.getElementById('calc-' + field);
+    const range = document.getElementById('calc-' + field + '-range');
+    range.value = input.value;
+    calculate();
+  }
+
+  function calculate() {
+    const P = parseFloat(document.getElementById('calc-amount').value) || 0;
+    const annualRate = parseFloat(document.getElementById('calc-rate').value) || 0;
+    const years = parseInt(document.getElementById('calc-term').value) || 30;
+
+    const n = years * 12;
+    const r = annualRate / 100 / 12;
+
+    let monthly;
+    if (r === 0) {
+      monthly = P / n;
+    } else {
+      monthly = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    }
+
+    const total = monthly * n;
+    const interest = total - P;
+
+    const fmt = (v) => '$' + Math.round(v).toLocaleString('en-AU');
+    document.getElementById('calc-monthly').textContent = fmt(monthly);
+    document.getElementById('calc-total').textContent = fmt(total);
+    document.getElementById('calc-interest').textContent = fmt(interest);
+  }
+
+  // ── Contact form submission ───────────────────────────────
+  document.getElementById('contact-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    document.getElementById('form-success').classList.remove('hidden');
+    e.target.reset();
+    setTimeout(() => {
+      document.getElementById('form-success').classList.add('hidden');
+    }, 6000);
+  });
+
+  // ── Scroll-margin for fixed nav ───────────────────────────
+  // Applied via CSS: [id] { scroll-margin-top: 80px }
+  const style = document.createElement('style');
+  style.textContent = '[id] { scroll-margin-top: 80px; }';
+  document.head.appendChild(style);
+
+  // Run initial calculation
+  calculate();
+</script>
+</body>
+</html>
