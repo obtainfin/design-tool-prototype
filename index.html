@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutor Assistant</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper:       '#FAF6EE',
+            'paper-dark':'#F0EAD9',
+            ink:         '#2C2416',
+            terracotta:  '#C8553D',
+            'terra-dark':'#A8432D',
+          },
+          fontFamily: {
+            fraunces: ['Fraunces', 'Georgia', 'serif'],
+            sans:     ['DM Sans', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- marked + DOMPurify -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+
+  <style>
+    body { background: #FAF6EE; font-family: 'DM Sans', sans-serif; color: #2C2416; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #D6CCBA; border-radius: 3px; }
+
+    /* Prose overrides */
+    .prose h1,.prose h2,.prose h3,.prose h4 { font-family: 'Fraunces', serif; color: #2C2416; margin-top: 1em; margin-bottom: 0.4em; }
+    .prose p { margin: 0.5em 0; }
+    .prose ul,.prose ol { padding-left: 1.4em; margin: 0.4em 0; }
+    .prose li { margin: 0.2em 0; }
+    .prose code { background: #F0EAD9; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.85em; }
+    .prose pre { background: #F0EAD9; padding: 0.8em 1em; border-radius: 8px; overflow-x: auto; }
+    .prose pre code { background: none; padding: 0; }
+    .prose blockquote { border-left: 3px solid #C8553D; padding-left: 1em; color: #5a4a36; font-style: italic; margin: 0.5em 0; }
+    .prose hr { border-color: #E0D8C8; }
+    .prose strong { color: #2C2416; }
+    .prose table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+    .prose th { background: #F0EAD9; padding: 0.4em 0.8em; text-align: left; border: 1px solid #D6CCBA; }
+    .prose td { padding: 0.4em 0.8em; border: 1px solid #E8E0CE; }
+    .prose tr:nth-child(even) td { background: #FAF6EE; }
+
+    /* Textarea auto-grow */
+    #user-input { resize: none; min-height: 44px; max-height: 200px; overflow-y: auto; }
+
+    /* Sidebar transition */
+    #sidebar { transition: transform 0.25s ease; }
+
+    /* Message animation */
+    .message-row { animation: fadeUp 0.2s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  </style>
+</head>
+
+<body class="h-screen flex overflow-hidden">
+
+  <!-- ── Mobile overlay ─────────────────────────────────────────────────── -->
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-ink/20 z-20 md:hidden"></div>
+
+  <!-- ── Sidebar ────────────────────────────────────────────────────────── -->
+  <aside id="sidebar"
+    class="fixed md:relative z-30 md:z-auto inset-y-0 left-0 w-72 flex flex-col bg-paper-dark border-r border-stone-200 -translate-x-full md:translate-x-0 shrink-0">
+
+    <!-- Logo -->
+    <div class="px-5 pt-6 pb-4 border-b border-stone-200">
+      <h1 class="font-fraunces text-xl font-semibold text-ink leading-tight">Tutor<br><span class="text-terracotta">Assistant</span></h1>
+      <p class="text-xs text-ink/50 mt-1">Australian Curriculum · Years F–6</p>
+    </div>
+
+    <!-- New chat -->
+    <div class="px-3 pt-3">
+      <button id="new-chat-btn"
+        class="w-full flex items-center gap-2 px-3 py-2 bg-terracotta hover:bg-terra-dark text-white rounded-lg text-sm font-medium transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New chat
+      </button>
+    </div>
+
+    <!-- Conversation list -->
+    <div class="flex-1 overflow-y-auto py-2 px-3">
+      <p class="text-xs font-medium text-ink/40 px-2 py-1 uppercase tracking-wide">Recent</p>
+      <ul id="conv-list" class="space-y-0.5"></ul>
+    </div>
+
+    <!-- Settings button -->
+    <div class="px-3 pb-4 pt-2 border-t border-stone-200">
+      <button id="settings-btn"
+        class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-ink/60 hover:bg-paper hover:text-ink transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main area ───────────────────────────────────────────────────────── -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Top bar (mobile) -->
+    <header class="flex md:hidden items-center gap-3 px-4 py-3 border-b border-stone-200 bg-paper shrink-0">
+      <button id="sidebar-toggle" class="p-1.5 rounded-lg hover:bg-paper-dark transition-colors text-ink/60">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="font-fraunces font-semibold text-ink">Tutor Assistant</span>
+    </header>
+
+    <!-- Messages -->
+    <div id="messages" class="flex-1 overflow-y-auto px-4 py-6 space-y-5">
+
+      <!-- Empty state -->
+      <div id="empty-state" class="flex flex-col items-center justify-center h-full gap-6 pb-10">
+        <div class="text-center">
+          <div class="text-5xl mb-3">🎓</div>
+          <h2 class="font-fraunces text-2xl font-semibold text-ink mb-1">What can I help you create?</h2>
+          <p class="text-ink/50 text-sm max-w-sm">Lesson plans, worksheets, parent notes, assessments — I'm here to make your tutoring sessions easier.</p>
+        </div>
+        <div id="quick-prompts" class="flex flex-wrap justify-center gap-2 max-w-xl"></div>
+      </div>
+
+    </div>
+
+    <!-- Input area -->
+    <div id="input-area" class="shrink-0 border-t border-stone-200 bg-paper px-4 py-3">
+      <div class="max-w-3xl mx-auto flex items-end gap-2 bg-white border border-stone-200 rounded-2xl shadow-sm px-4 py-2 focus-within:border-terracotta/60 focus-within:ring-2 focus-within:ring-terracotta/10 transition-all">
+        <textarea id="user-input" rows="1"
+          class="flex-1 bg-transparent outline-none text-sm text-ink placeholder:text-ink/35 leading-relaxed pt-1.5 pb-1"
+          placeholder="Ask me to plan a lesson, create a worksheet, draft a parent note…"></textarea>
+        <button id="send-btn"
+          class="shrink-0 mb-0.5 w-8 h-8 flex items-center justify-center bg-terracotta hover:bg-terra-dark text-white rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <p class="text-center text-xs text-ink/30 mt-2">Shift+Enter for new line · responses may not be perfect, use your judgement</p>
+    </div>
+  </main>
+
+  <!-- ── Welcome modal ──────────────────────────────────────────────────── -->
+  <div id="welcome-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-ink/30 backdrop-blur-sm p-4">
+    <div class="bg-paper rounded-2xl shadow-2xl max-w-md w-full p-8 border border-stone-200">
+      <div class="text-4xl mb-4 text-center">📚</div>
+      <h2 class="font-fraunces text-2xl font-semibold text-ink text-center mb-2">Welcome!</h2>
+      <p class="text-ink/70 text-sm text-center mb-6">Your AI tutoring assistant for the Australian curriculum. To get started, you'll need a free Anthropic API key.</p>
+
+      <div class="bg-paper-dark rounded-xl p-4 text-sm space-y-2 mb-6 text-ink/70">
+        <p class="font-medium text-ink">Quick setup:</p>
+        <ol class="list-decimal list-inside space-y-1">
+          <li>Go to <span class="font-mono bg-paper px-1.5 py-0.5 rounded text-xs">console.anthropic.com</span></li>
+          <li>Create an API key</li>
+          <li>Paste it in Settings (opens next)</li>
+        </ol>
+        <p class="text-xs text-ink/50 pt-1">Your key is stored locally in your browser and is never sent anywhere except directly to Anthropic.</p>
+      </div>
+
+      <button id="welcome-close"
+        class="w-full bg-terracotta hover:bg-terra-dark text-white font-medium py-2.5 rounded-xl transition-colors">
+        Open Settings →
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Settings modal ─────────────────────────────────────────────────── -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-ink/30 backdrop-blur-sm p-4">
+    <div class="bg-paper rounded-2xl shadow-2xl max-w-lg w-full border border-stone-200 flex flex-col max-h-[90vh]">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-stone-200 shrink-0">
+        <h2 class="font-fraunces text-xl font-semibold text-ink">Settings</h2>
+        <button id="settings-close" class="p-1.5 rounded-lg hover:bg-paper-dark text-ink/40 hover:text-ink transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="overflow-y-auto flex-1 px-6 py-5 space-y-5">
+
+        <!-- API Key -->
+        <div>
+          <label class="block text-sm font-medium text-ink mb-1.5">Anthropic API Key</label>
+          <input id="settings-api-key" type="password" placeholder="sk-ant-…"
+            class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all font-mono" />
+          <p class="text-xs text-ink/40 mt-1">Stored in your browser only. Never sent to any server except Anthropic.</p>
+        </div>
+
+        <!-- Model -->
+        <div>
+          <label class="block text-sm font-medium text-ink mb-1.5">Model</label>
+          <select id="settings-model"
+            class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all appearance-none cursor-pointer">
+          </select>
+        </div>
+
+        <!-- System prompt -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-sm font-medium text-ink">System Prompt</label>
+            <button id="settings-reset-prompt" class="text-xs text-terracotta hover:underline">Reset to default</button>
+          </div>
+          <textarea id="settings-system-prompt" rows="10"
+            class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-mono outline-none focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/10 transition-all leading-relaxed resize-none"></textarea>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="border border-red-200 rounded-xl p-4">
+          <p class="text-sm font-medium text-red-700 mb-1">Danger zone</p>
+          <p class="text-xs text-red-500 mb-3">This will permanently delete all conversations, your API key, and all settings.</p>
+          <button id="settings-clear-data" class="text-xs text-red-600 border border-red-300 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors">
+            Clear all data
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 pb-6 pt-4 border-t border-stone-200 shrink-0 flex justify-end gap-3">
+        <button id="settings-close2" onclick="closeSettings()"
+          class="px-4 py-2 text-sm text-ink/60 hover:text-ink rounded-xl hover:bg-paper-dark transition-colors">
+          Cancel
+        </button>
+        <button id="settings-save"
+          class="px-5 py-2 bg-terracotta hover:bg-terra-dark text-white text-sm font-medium rounded-xl transition-colors">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
