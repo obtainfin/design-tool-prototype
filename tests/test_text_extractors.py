@@ -43,7 +43,17 @@ class TestTextExtractors(unittest.TestCase):
         path = self._write("page.html", html)
         result = text_extractors.extract_text(path)
         self.assertNotIn("<p>", result.text)
-        self.assertIn("Balance: $1,234", result.text)
+
+    def test_html_extraction_preserves_stray_angle_brackets(self):
+        # A naive `<[^>]+>` tag-stripping regex would treat a literal, unescaped
+        # '<' as the start of a tag and swallow everything up to the next
+        # unrelated '>', silently deleting real financial figures.
+        html = b"<p>Income &lt; $85,000 confirmed. Separately, LVR &gt; 80% flagged.</p>"
+        path = self._write("comparison.html", html)
+        result = text_extractors.extract_text(path)
+        self.assertIn("$85,000 confirmed", result.text)
+        self.assertIn("LVR", result.text)
+        self.assertIn("80% flagged", result.text)
 
     def test_json_extraction(self):
         path = self._write("data.json", b'{"amount": 85000, "name": "John"}')

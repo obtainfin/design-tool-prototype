@@ -16,6 +16,7 @@ import zipfile
 from dataclasses import dataclass, field
 from email import message_from_bytes, policy
 from email.message import Message
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import List
 
@@ -23,6 +24,32 @@ MAX_CHARS = 250_000
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"[ \t]+")
+
+
+class _TextOnlyHTMLParser(HTMLParser):
+    """Collects text nodes only, skipping <script>/<style> content.
+
+    Unlike a naive ``<[^>]+>`` regex, a real parser doesn't treat a stray
+    unescaped '<' in body text (e.g. "Income < $85,000") as the start of a
+    tag that swallows everything up to the next unrelated '>'.
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self._skip_depth = 0
+        self.parts: List[str] = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style"):
+            self._skip_depth += 1
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style") and self._skip_depth > 0:
+            self._skip_depth -= 1
+
+    def handle_data(self, data):
+        if self._skip_depth == 0:
+            self.parts.append(data)
 
 
 @dataclass
@@ -36,12 +63,13 @@ def _cap(text: str) -> str:
 
 
 def _strip_html(html: str) -> str:
-    html = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", html)
-    html = _TAG_RE.sub(" ", html)
-    text = re.sub(r"&nbsp;", " ", html)
-    text = re.sub(r"&amp;", "&", text)
-    text = re.sub(r"&lt;", "<", text)
-    text = re.sub(r"&gt;", ">", text)
+    parser = _TextOnlyHTMLParser()
+    try:
+        parser.feed(html)
+        parser.close()
+        text = " ".join(parser.parts)
+    except Exception:  # noqa: BLE001 - fall back to the naive regex on bizarre input
+        text = _TAG_RE.sub(" ", html)
     text = re.sub(r"\s*\n\s*", "\n", text)
     text = _WS_RE.sub(" ", text)
     return text.strip()

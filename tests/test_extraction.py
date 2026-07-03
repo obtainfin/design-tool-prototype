@@ -153,6 +153,49 @@ class TestMergeAndConflicts(unittest.TestCase):
         pool = extraction.merge_evidence([e1, e2])
         self.assertEqual(extraction.detect_conflicts(pool), [])
 
+    def test_negative_money_values_are_not_conflated_with_positive(self):
+        e1 = extraction.FieldEvidence(
+            field="security_property.existing_debt", value="-$5,000", source_document="a.pdf",
+            confidence="high", confidence_reason="r", quote="q", manual_review_required=False, category="regex",
+        )
+        e2 = extraction.FieldEvidence(
+            field="security_property.existing_debt", value="$5,000", source_document="b.pdf",
+            confidence="high", confidence_reason="r", quote="q", manual_review_required=False, category="regex",
+        )
+        pool = extraction.merge_evidence([e1, e2])
+        conflicts = extraction.detect_conflicts(pool)
+        self.assertEqual(len(conflicts), 1)
+
+    def test_percent_values_with_different_precision_do_not_conflict(self):
+        e1 = extraction.FieldEvidence(
+            field="loan.lvr", value="80%", source_document="a.pdf",
+            confidence="high", confidence_reason="r", quote="q", manual_review_required=False, category="regex",
+        )
+        e2 = extraction.FieldEvidence(
+            field="loan.lvr", value="80.00%", source_document="b.pdf",
+            confidence="high", confidence_reason="r", quote="q", manual_review_required=False, category="regex",
+        )
+        pool = extraction.merge_evidence([e1, e2])
+        self.assertEqual(extraction.detect_conflicts(pool), [])
+
+    def test_dates_with_different_formats_do_not_conflict(self):
+        e1 = extraction.FieldEvidence(
+            field="client.dob", value="1/6/1985", source_document="a.pdf",
+            confidence="medium", confidence_reason="r", quote="q", manual_review_required=True, category="regex",
+        )
+        e2 = extraction.FieldEvidence(
+            field="client.dob", value="01/06/1985", source_document="b.pdf",
+            confidence="medium", confidence_reason="r", quote="q", manual_review_required=True, category="regex",
+        )
+        pool = extraction.merge_evidence([e1, e2])
+        self.assertEqual(extraction.detect_conflicts(pool), [])
+
+    def test_field_evidence_from_dict_tolerates_missing_keys(self):
+        evidence = extraction.FieldEvidence.from_dict({"field": "loan.amount", "value": "$1"})
+        self.assertEqual(evidence.source_document, "")
+        self.assertEqual(evidence.confidence, "low")
+        self.assertFalse(evidence.manual_review_required)
+
 
 class TestAIExtractionStripsTaxIds(unittest.TestCase):
     class _RecordingClient:

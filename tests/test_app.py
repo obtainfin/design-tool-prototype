@@ -162,6 +162,36 @@ class TestApp(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(data["assistant"]["source"], "action")
 
+    def test_ask_keyword_sign_off_nccp_rebuilds_board_immediately(self):
+        self._create_deal("NCCP Rebuild Deal")
+        self._request("POST", "/api/deal/NCCP%20Rebuild%20Deal/run")
+        status, data = self._request(
+            "POST", "/api/deal/NCCP%20Rebuild%20Deal/ask", {"question": "sign off nccp"}
+        )
+        self.assertEqual(status, 200)
+        controls = data["board"]["compliance"]["controls"]
+        self.assertTrue(all(c["status"] == "reviewed" for c in controls))
+
+    def test_ask_does_not_treat_a_genuine_question_as_a_command(self):
+        self._create_deal("Question Deal")
+        status, data = self._request(
+            "POST",
+            "/api/deal/Question%20Deal/ask",
+            {"question": "should I mark step done now or wait for the NOA?"},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(data["stage"], "intake")  # unchanged -- no accidental advance
+        self.assertNotEqual(data["assistant"]["source"], "action")
+
+    # -- path safety -----------------------------------------------------------
+
+    def test_create_deal_named_dot_is_rejected(self):
+        status, data = self._request("POST", "/api/deals", {"name": ".", "deal_type": "payg_purchase"})
+        self.assertEqual(status, 400)
+        self.assertIn("error", data)
+        # the shared Deals root itself must not have been turned into a deal
+        self.assertFalse((Path(self.tmp) / "deal_state.json").exists())
+
     # -- free text: AI when configured, fallback when not --------------------
 
     def test_ask_falls_back_offline_when_ai_not_configured(self):

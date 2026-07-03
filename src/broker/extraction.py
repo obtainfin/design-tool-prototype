@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field as dataclass_field
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from . import security
@@ -82,6 +83,22 @@ class FieldEvidence:
             "manual_review_required": self.manual_review_required,
             "category": self.category,
         }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "FieldEvidence":
+        """Reconstruct from a serialised dict, tolerating missing keys so a
+        schema change doesn't crash every subsequent load of older data.
+        """
+        return cls(
+            field=data.get("field", ""),
+            value=data.get("value", ""),
+            source_document=data.get("source_document", ""),
+            confidence=normalize_confidence(data.get("confidence")),
+            confidence_reason=data.get("confidence_reason", ""),
+            quote=data.get("quote", ""),
+            manual_review_required=bool(data.get("manual_review_required", False)),
+            category=data.get("category", "regex"),
+        )
 
 
 def normalize_confidence(value: Any) -> str:
@@ -237,11 +254,18 @@ def extract_regex_fields(text: str, source_document: str) -> List[FieldEvidence]
 _classifier_singleton: Optional[Classifier] = None
 
 
-def _document_types() -> List[str]:
+def get_classifier() -> Classifier:
+    """Process-lifetime cached Classifier, shared by every caller so the
+    keyword-config JSON is parsed once instead of once per document/run.
+    """
     global _classifier_singleton
     if _classifier_singleton is None:
         _classifier_singleton = Classifier()
-    return _classifier_singleton.document_types
+    return _classifier_singleton
+
+
+def _document_types() -> List[str]:
+    return get_classifier().document_types
 
 
 def build_ai_instructions() -> str:
@@ -371,15 +395,35 @@ def merge_evidence(evidence_list: List[FieldEvidence]) -> Dict[str, List[FieldEv
     return pool
 
 
+_DATE_FORMATS = ("%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%Y-%m-%d")
+
+
 def _normalize_for_compare(field_name: str, value: str) -> str:
     value_type = FIELD_PATTERNS.get(field_name, ([], "text"))[1]
     if value_type == "money":
-        digits = re.sub(r"[^\d.]", "", value)
+        # Keep a leading '-' so a negative/overdrawn balance doesn't collide
+        # with its positive counterpart once non-digits are stripped.
+        digits = re.sub(r"[^\d.\-]", "", value)
         if digits:
             try:
                 return f"{float(digits):.2f}"
             except ValueError:
                 pass
+        return value.strip().lower()
+    if value_type == "percent":
+        digits = re.sub(r"[^\d.]", "", value)
+        if digits:
+            try:
+                return f"{float(digits):.2f}%"
+            except ValueError:
+                pass
+        return value.strip().lower()
+    if value_type == "date":
+        for fmt in _DATE_FORMATS:
+            try:
+                return datetime.strptime(value.strip(), fmt).date().isoformat()
+            except ValueError:
+                continue
         return value.strip().lower()
     return re.sub(r"\s+", " ", value.strip().lower())
 

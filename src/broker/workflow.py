@@ -76,7 +76,7 @@ def load_extra_evidence(deal_dir: Path) -> List[FieldEvidence]:
         if not line:
             continue
         data = json.loads(line)
-        evidence.append(FieldEvidence(**data))
+        evidence.append(FieldEvidence.from_dict(data))
     return evidence
 
 
@@ -132,11 +132,13 @@ def run(deal_dir: Path, deal_type: Optional[str] = None, ai_client: Optional[AIC
     paths = ensure_deal_folders(deal_dir)
     state = deal_state.load(deal_dir, deal_name=deal_dir.name, deal_type=deal_type)
     if deal_type and state.deal_type != deal_type:
+        previous_type = state.deal_type
         state.deal_type = deal_type
+        state.log("deal_type_changed", "broker", f"Deal type changed from '{previous_type}' to '{deal_type}'.")
 
     if ai_client is None:
         ai_client = AIClient()
-    classifier = Classifier()
+    classifier = extraction.get_classifier()
 
     all_evidence: List[FieldEvidence] = []
     doc_records: List[Dict[str, Any]] = []
@@ -160,9 +162,17 @@ def run(deal_dir: Path, deal_type: Optional[str] = None, ai_client: Optional[AIC
 
         category_dir = paths["filed"] / _safe_category(result["document_type"])
         category_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(doc_path, category_dir / doc_path.name)
-        rel_dest = (category_dir / doc_path.name).relative_to(deal_dir)
-        state.log("document_filed", "system", f"Filed {doc_path.name} as '{result['document_type']}' -> {rel_dest}")
+        dest = category_dir / doc_path.name
+        src_stat = doc_path.stat()
+        already_filed = (
+            dest.exists()
+            and dest.stat().st_size == src_stat.st_size
+            and dest.stat().st_mtime == src_stat.st_mtime
+        )
+        if not already_filed:
+            shutil.copy2(doc_path, dest)
+            rel_dest = dest.relative_to(deal_dir)
+            state.log("document_filed", "system", f"Filed {doc_path.name} as '{result['document_type']}' -> {rel_dest}")
         if result["ai_failure"]:
             state.log("ai_extraction_failed", "system", f"{doc_path.name}: {result['ai_failure']}")
 

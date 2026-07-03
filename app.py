@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import subprocess
+import threading
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -32,6 +33,7 @@ from broker import extraction  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = 8789
+MAX_UPLOAD_BYTES = 100 * 1024 * 1024  # 100 MB per upload request
 
 DEAL_TYPES = [
     "payg_purchase", "payg_refinance", "investment_loan",
@@ -71,14 +73,33 @@ def sanitize_deal_name(name: str) -> str:
 
 def deal_dir_for(name: str) -> Path:
     safe = sanitize_deal_name(name)
-    if not safe:
+    if not safe or set(safe) <= {"."}:
         raise ValueError("Deal name is empty or invalid after sanitisation.")
     root = deals_root().resolve()
     root.mkdir(parents=True, exist_ok=True)
     candidate = (root / safe).resolve()
-    if candidate != root and root not in candidate.parents:
+    if candidate == root or root not in candidate.parents:
         raise ValueError("Invalid deal name.")
     return candidate
+
+
+_deal_locks: Dict[str, threading.Lock] = {}
+_deal_locks_guard = threading.Lock()
+
+
+def _lock_for_deal(deal_dir: Path) -> threading.Lock:
+    """One lock per deal directory, so concurrent requests against the same
+    deal (ThreadingHTTPServer runs each request in its own thread) serialize
+    their load-mutate-save cycle instead of racing and silently dropping
+    one side's mutation.
+    """
+    key = str(deal_dir)
+    with _deal_locks_guard:
+        lock = _deal_locks.get(key)
+        if lock is None:
+            lock = threading.Lock()
+            _deal_locks[key] = lock
+        return lock
 
 
 def list_deal_names() -> List[str]:
@@ -90,10 +111,17 @@ def list_deal_names() -> List[str]:
     )
 
 
+_lenders_cache: Optional[List[Dict[str, str]]] = None
+
+
 def load_lenders() -> List[Dict[str, str]]:
-    path = PROJECT_ROOT / "config" / "lenders.json"
-    with open(path, "r", encoding="utf-8") as fh:
-        return json.load(fh)["lenders"]
+    """Process-lifetime cached lender list -- static config, read once."""
+    global _lenders_cache
+    if _lenders_cache is None:
+        path = PROJECT_ROOT / "config" / "lenders.json"
+        with open(path, "r", encoding="utf-8") as fh:
+            _lenders_cache = json.load(fh)["lenders"]
+    return _lenders_cache
 
 
 def read_board(deal_dir: Path) -> Optional[Dict[str, Any]]:
@@ -107,7 +135,7 @@ def read_board(deal_dir: Path) -> Optional[Dict[str, Any]]:
 def evidence_pool_from_board(board: Dict[str, Any]) -> Dict[str, List[FieldEvidence]]:
     pool: Dict[str, List[FieldEvidence]] = {}
     for field_name, items in board.get("fields", {}).items():
-        pool[field_name] = [FieldEvidence(**item) for item in items]
+        pool[field_name] = [FieldEvidence.from_dict(item) for item in items]
     return pool
 
 
@@ -164,7 +192,7 @@ JOB_INSTRUCTIONS = {
     ),
 }
 
-_CONF_RANK = {"high": 0, "medium": 1, "low": 2}
+_CONF_RANK = board_mod.CONFIDENCE_RANK
 
 
 def _board_context(board: Dict[str, Any], state: DealState) -> Dict[str, Any]:
@@ -349,7 +377,14 @@ def _offline_summary_text(board: Dict[str, Any], state: DealState) -> str:
 def try_route_keyword_action(text: str, state: DealState, deal_dir: Path) -> Optional[str]:
     """Keyword routing for state actions. Returns a confirmation message if a
     keyword action was taken (and persists the mutation), else None.
+
+    A message containing '?' is treated as a genuine question (e.g. "should
+    I mark step done now or wait for the NOA?") and is never routed to a
+    state-mutating action -- only unambiguous literal commands are.
     """
+    if "?" in text:
+        return None
+
     lowered = text.strip().lower()
 
     if re.search(r"\bmark\s+step\s+done\b", lowered) or re.search(r"\bdone\b.{0,12}\bnext\s*step\b", lowered):
@@ -366,12 +401,7 @@ def try_route_keyword_action(text: str, state: DealState, deal_dir: Path) -> Opt
         valid_codes = {lender["code"] for lender in load_lenders()}
         if code not in valid_codes:
             return f"'{code}' is not a recognised lender shortcode. Options: {', '.join(sorted(valid_codes))}."
-        state.set_lender(code, actor="broker (free text)")
-        if state.stage == "lender_select":
-            try:
-                state.advance(actor="broker (free text)")
-            except InvalidTransitionError:
-                pass
+        _select_lender(state, code, actor="broker (free text)")
         deal_state.save(deal_dir, state)
         return (
             f"Selected lender {code}. Reminder: lender policy notes are placeholders -- "
@@ -382,9 +412,26 @@ def try_route_keyword_action(text: str, state: DealState, deal_dir: Path) -> Opt
         all_ids = [c["id"] for c in compliance.load_config()["controls"]]
         state.sign_off_nccp(all_ids, actor="broker (free text)")
         deal_state.save(deal_dir, state)
+        # Rebuild the board so the NCCP/BID compliance section (and its
+        # "reviewed" counts shown in the UI badge) reflect the sign-off
+        # immediately, instead of only on the next manual Run.
+        workflow.run(deal_dir, deal_type=state.deal_type, ai_client=AIClient())
         return "Broker sign-off recorded for all NCCP/BID controls. " + compliance.VERIFY_WARNING
 
     return None
+
+
+def _select_lender(state: DealState, code: str, actor: str) -> None:
+    """Set the active lender, auto-advancing past lender_select if that's
+    the gate it was blocking. Shared by the /lender endpoint and the
+    'select lender X' free-text command so both stay in sync.
+    """
+    state.set_lender(code, actor=actor)
+    if state.stage == "lender_select":
+        try:
+            state.advance(actor=actor)
+        except InvalidTransitionError:
+            pass
 
 
 # -- request handling ---------------------------------------------------------
@@ -489,10 +536,20 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
             return
         self._send_json(200, self._build_deal_payload(name, deal_dir))
 
-    def _build_deal_payload(self, name: str, deal_dir: Path, assistant: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _build_deal_payload(
+        self,
+        name: str,
+        deal_dir: Path,
+        assistant: Optional[Dict[str, Any]] = None,
+        ai_client: Optional[AIClient] = None,
+        lenders: Optional[List[Dict[str, str]]] = None,
+    ) -> Dict[str, Any]:
         state = deal_state.load(deal_dir, deal_name=name)
         board = read_board(deal_dir)
-        ai_client = AIClient()
+        if ai_client is None:
+            ai_client = AIClient()
+        if lenders is None:
+            lenders = load_lenders()
 
         st_comparison = None
         if board is not None:
@@ -515,10 +572,9 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
             "selected_lender": state.selected_lender,
             "st_prep_recorded": state.st_prep_recorded,
             "can_advance": state.can_advance(),
-            "is_final_stage": state.stage == "submit",
             "ai_status": ai_client.status_label(),
             "ai_enabled": ai_client.enabled,
-            "lenders": load_lenders(),
+            "lenders": lenders,
             "deal_types": DEAL_TYPES,
             "board": board,
             "st_comparison": st_comparison,
@@ -546,7 +602,8 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
             deal_dir = deal_dir_for(name)
 
             if action == "upload":
-                self._handle_upload(name, deal_dir)
+                with _lock_for_deal(deal_dir):
+                    self._handle_upload(name, deal_dir)
                 return
 
             if not deal_dir.exists():
@@ -568,7 +625,12 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
             if handler is None:
                 self._error(404, "Unknown action.")
                 return
-            handler(name, deal_dir)
+            # Serialize every load-mutate-save cycle per deal so two
+            # concurrent requests against the same deal can't silently
+            # clobber each other's state (ThreadingHTTPServer runs each
+            # request on its own thread).
+            with _lock_for_deal(deal_dir):
+                handler(name, deal_dir)
         except security.CredentialDetectedError as exc:
             self._error(400, str(exc))
         except ValueError as exc:
@@ -584,18 +646,19 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
             self._error(400, f"Unknown deal_type '{deal_type}'.")
             return
         deal_dir = deal_dir_for(name)
-        safe_name = deal_dir.name
-        is_new = not deal_dir.exists()
-        workflow.ensure_deal_folders(deal_dir)
-        state = deal_state.load(deal_dir, deal_name=safe_name, deal_type=deal_type)
-        deal_state.save(deal_dir, state)
+        with _lock_for_deal(deal_dir):
+            safe_name = deal_dir.name
+            is_new = not deal_dir.exists()
+            workflow.ensure_deal_folders(deal_dir)
+            state = deal_state.load(deal_dir, deal_name=safe_name, deal_type=deal_type)
+            deal_state.save(deal_dir, state)
         self._send_json(201 if is_new else 200, self._build_deal_payload(safe_name, deal_dir))
 
     def _handle_run(self, name: str, deal_dir: Path) -> None:
         ai_client = AIClient()
         state = deal_state.load(deal_dir, deal_name=name)
         workflow.run(deal_dir, deal_type=state.deal_type, ai_client=ai_client)
-        self._send_json(200, self._build_deal_payload(name, deal_dir))
+        self._send_json(200, self._build_deal_payload(name, deal_dir, ai_client=ai_client))
 
     def _handle_advance(self, name: str, deal_dir: Path) -> None:
         state = deal_state.load(deal_dir, deal_name=name)
@@ -610,19 +673,15 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
     def _handle_lender(self, name: str, deal_dir: Path) -> None:
         payload = self._read_json_body()
         code = str(payload.get("lender_code", "")).strip().upper()
-        valid_codes = {lender["code"] for lender in load_lenders()}
+        lenders = load_lenders()
+        valid_codes = {lender["code"] for lender in lenders}
         if code not in valid_codes:
             self._error(400, f"Unknown lender_code '{code}'.")
             return
         state = deal_state.load(deal_dir, deal_name=name)
-        state.set_lender(code, actor="broker")
-        if state.stage == "lender_select":
-            try:
-                state.advance(actor="broker")
-            except InvalidTransitionError:
-                pass
+        _select_lender(state, code, actor="broker")
         deal_state.save(deal_dir, state)
-        self._send_json(200, self._build_deal_payload(name, deal_dir))
+        self._send_json(200, self._build_deal_payload(name, deal_dir, lenders=lenders))
 
     def _handle_st_prep(self, name: str, deal_dir: Path) -> None:
         state = deal_state.load(deal_dir, deal_name=name)
@@ -635,11 +694,11 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
         board = read_board(deal_dir)
         ai_client = AIClient()
         result = generate_step_reply(ai_client, state, board)
-        if state.stage == "st_prep" and board is not None:
+        if state.stage == "st_prep" and board is not None and not state.st_prep_recorded:
             state.record_st_prep(actor="broker")
         state.log("assistant_reply", result.get("source", "assistant"), result["reply"][:300])
         deal_state.save(deal_dir, state)
-        payload = self._build_deal_payload(name, deal_dir, assistant=result)
+        payload = self._build_deal_payload(name, deal_dir, assistant=result, ai_client=ai_client)
         self._send_json(200, payload)
 
     def _handle_ask(self, name: str, deal_dir: Path) -> None:
@@ -652,7 +711,9 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
 
         action_message = try_route_keyword_action(question, state, deal_dir)
         if action_message is not None:
-            state = deal_state.load(deal_dir, deal_name=name)  # reload post-mutation
+            # `state` already reflects the mutation try_route_keyword_action
+            # made in place (and it has already been persisted) -- no need
+            # to reload it from disk.
             result = {"reply": action_message, "source": "action"}
             state.log("assistant_reply", "action", result["reply"][:300])
             deal_state.save(deal_dir, state)
@@ -664,7 +725,7 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
         result = generate_free_text_reply(ai_client, question, board, state)
         state.log("assistant_reply", result.get("source", "assistant"), result["reply"][:300])
         deal_state.save(deal_dir, state)
-        self._send_json(200, self._build_deal_payload(name, deal_dir, assistant=result))
+        self._send_json(200, self._build_deal_payload(name, deal_dir, assistant=result, ai_client=ai_client))
 
     def _handle_call_note(self, name: str, deal_dir: Path) -> None:
         payload_in = self._read_json_body()
@@ -693,7 +754,7 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
         deal_state.save(deal_dir, state)
 
         workflow.run(deal_dir, deal_type=state.deal_type, ai_client=ai_client)
-        self._send_json(200, self._build_deal_payload(name, deal_dir))
+        self._send_json(200, self._build_deal_payload(name, deal_dir, ai_client=ai_client))
 
     def _handle_file_note(self, name: str, deal_dir: Path) -> None:
         payload_in = self._read_json_body()
@@ -735,6 +796,9 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
             self._error(400, "Expected multipart/form-data upload.")
             return
         length = int(self.headers.get("Content-Length", 0) or 0)
+        if length > MAX_UPLOAD_BYTES:
+            self._error(413, f"Upload too large (max {MAX_UPLOAD_BYTES // (1024 * 1024)} MB per request).")
+            return
         raw_body = self.rfile.read(length) if length else b""
 
         workflow.ensure_deal_folders(deal_dir)
@@ -762,6 +826,8 @@ class LoanAssistantHandler(BaseHTTPRequestHandler):
 def _safe_upload_filename(filename: str) -> str:
     name = Path(filename or "").name
     name = _INVALID_UPLOAD_CHARS.sub("-", name).strip()
+    if not name or set(name) <= {"."}:
+        return ""
     return name
 
 
