@@ -1,0 +1,233 @@
+{
+  "_note": "Missing-document checklists per deal type. Buckets: required_now, required_before_submission, likely_lender_specific, nice_to_have. Each item is matched against filed/inbox document classifications by 'matches' (one of the classifier document types).",
+  "deal_types": {
+    "payg_purchase": {
+      "required_now": [
+        {"item": "2 most recent payslips", "matches": ["payslip"]},
+        {"item": "Photo ID", "matches": ["ID document"]},
+        {"item": "Contract of sale", "matches": ["contract of sale"]},
+        {"item": "Evidence of deposit / genuine savings", "matches": ["bank statement"]},
+        {"item": "Latest 3 months bank statements", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "Notice of assessment (latest year)", "matches": ["notice of assessment"]},
+        {"item": "Rates notice for security property", "matches": ["rates notice"]},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Lender application form", "matches": []},
+        {"item": "Serviceability calculator export", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "payg_refinance": {
+      "required_now": [
+        {"item": "2 most recent payslips", "matches": ["payslip"]},
+        {"item": "Photo ID", "matches": ["ID document"]},
+        {"item": "Current loan statement", "matches": ["loan statement"]},
+        {"item": "Latest 3 months bank statements", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "Notice of assessment (latest year)", "matches": ["notice of assessment"]},
+        {"item": "Rates notice for security property", "matches": ["rates notice"]},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Discharge authority", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "investment_loan": {
+      "required_now": [
+        {"item": "2 most recent payslips", "matches": ["payslip"]},
+        {"item": "Photo ID", "matches": ["ID document"]},
+        {"item": "Latest 3 months bank statements", "matches": ["bank statement"]},
+        {"item": "Existing rental income evidence (lease/statement)", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "Notice of assessment (latest year)", "matches": ["notice of assessment"]},
+        {"item": "Rates notice for security property", "matches": ["rates notice"]},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Rental appraisal / lease agreement", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "self_employed_full_doc": {
+      "required_now": [
+        {"item": "Photo ID", "matches": ["ID document"]},
+        {"item": "2 years personal tax returns", "matches": ["tax return"]},
+        {"item": "2 years notices of assessment", "matches": ["notice of assessment"]},
+        {"item": "2 years business tax returns / financials", "matches": ["tax return"]},
+        {"item": "Latest 3 months business bank statements", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "ATO portal print-out (integrated client account)", "matches": []},
+        {"item": "Accountant's letter", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "BAS statements (last 4 quarters)", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "self_employed_alt_doc": {
+      "required_now": [
+        {"item": "Photo ID", "matches": ["ID document"]},
+        {"item": "Accountant's declaration", "matches": []},
+        {"item": "Latest 6-12 months business bank statements", "matches": ["bank statement"]},
+        {"item": "BAS statements (last 4 quarters)", "matches": []}
+      ],
+      "required_before_submission": [
+        {"item": "ABN/GST registration evidence", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Business activity declaration form", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "commercial_property_purchase": {
+      "required_now": [
+        {"item": "Photo ID (all directors/guarantors)", "matches": ["ID document"]},
+        {"item": "Contract of sale", "matches": ["contract of sale"]},
+        {"item": "2 years business financials", "matches": ["tax return"]},
+        {"item": "Latest 6 months business bank statements", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "Company/trust structure documents", "matches": []},
+        {"item": "Lease agreement (if tenanted)", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Valuation instruction form", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "commercial_refinance": {
+      "required_now": [
+        {"item": "Photo ID (all directors/guarantors)", "matches": ["ID document"]},
+        {"item": "Current commercial loan statement", "matches": ["loan statement"]},
+        {"item": "2 years business financials", "matches": ["tax return"]},
+        {"item": "Latest 6 months business bank statements", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "Company/trust structure documents", "matches": []},
+        {"item": "Lease agreement (if tenanted)", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Discharge authority", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "smsf_residential_property_loan": {
+      "required_now": [
+        {"item": "Photo ID (all trustees/members)", "matches": ["ID document"]},
+        {"item": "SMSF trust deed", "matches": []},
+        {"item": "Bare trust deed", "matches": []},
+        {"item": "Latest SMSF financials/statements", "matches": ["bank statement"]},
+        {"item": "Contract of sale", "matches": ["contract of sale"]}
+      ],
+      "required_before_submission": [
+        {"item": "SMSF investment strategy", "matches": []},
+        {"item": "Member contribution evidence", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Lender SMSF checklist", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "smsf_commercial_property_loan": {
+      "required_now": [
+        {"item": "Photo ID (all trustees/members)", "matches": ["ID document"]},
+        {"item": "SMSF trust deed", "matches": []},
+        {"item": "Bare trust deed", "matches": []},
+        {"item": "Latest SMSF financials/statements", "matches": ["bank statement"]},
+        {"item": "Contract of sale", "matches": ["contract of sale"]}
+      ],
+      "required_before_submission": [
+        {"item": "SMSF investment strategy", "matches": []},
+        {"item": "Lease agreement (if business real property)", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Lender SMSF checklist", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "company_trust_borrower": {
+      "required_now": [
+        {"item": "Photo ID (all directors/beneficiaries/guarantors)", "matches": ["ID document"]},
+        {"item": "Company extract / ASIC search", "matches": []},
+        {"item": "Trust deed", "matches": []},
+        {"item": "Latest 2 years financials", "matches": ["tax return"]}
+      ],
+      "required_before_submission": [
+        {"item": "Signed fact find", "matches": ["fact find"]},
+        {"item": "Guarantor consent forms", "matches": []}
+      ],
+      "likely_lender_specific": [
+        {"item": "Company/trust structure diagram", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "business_lending": {
+      "required_now": [
+        {"item": "Photo ID (all directors/guarantors)", "matches": ["ID document"]},
+        {"item": "Latest 2 years business financials", "matches": ["tax return"]},
+        {"item": "Latest 6 months business bank statements", "matches": ["bank statement"]},
+        {"item": "BAS statements (last 4 quarters)", "matches": []}
+      ],
+      "required_before_submission": [
+        {"item": "Business plan / use of funds statement", "matches": []},
+        {"item": "Signed fact find", "matches": ["fact find"]}
+      ],
+      "likely_lender_specific": [
+        {"item": "Asset and liability statement", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    },
+    "lite_doc_scenario": {
+      "required_now": [
+        {"item": "Photo ID", "matches": ["ID document"]},
+        {"item": "Signed income declaration", "matches": []},
+        {"item": "Latest 3 months bank statements", "matches": ["bank statement"]}
+      ],
+      "required_before_submission": [
+        {"item": "Signed fact find", "matches": ["fact find"]},
+        {"item": "Accountant or BAS support (if available)", "matches": []}
+      ],
+      "likely_lender_specific": [
+        {"item": "Lender lite-doc declaration form", "matches": []}
+      ],
+      "nice_to_have": [
+        {"item": "Credit report", "matches": ["credit report"]}
+      ]
+    }
+  }
+}

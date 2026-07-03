@@ -1,0 +1,75 @@
+{
+  "_verify_warning": "BROKER MUST VERIFY: this control list is a reasonable default, NOT the broker's aggregator audit document. Verify against your aggregator's current audit checklist before relying on this.",
+  "nccp_applicable_deal_types": [
+    "payg_purchase",
+    "payg_refinance",
+    "investment_loan",
+    "self_employed_full_doc",
+    "self_employed_alt_doc",
+    "lite_doc_scenario"
+  ],
+  "nccp_exempt_deal_types": [
+    "commercial_property_purchase",
+    "commercial_refinance",
+    "smsf_residential_property_loan",
+    "smsf_commercial_property_loan",
+    "company_trust_borrower",
+    "business_lending"
+  ],
+  "controls": [
+    {
+      "id": "credit_guide_privacy_consent",
+      "name": "Credit guide and privacy consent signed",
+      "keywords": ["credit guide", "privacy consent", "privacy statement acknowledged"],
+      "broker_action": "Confirm the signed credit guide and privacy consent are on file, dated at or before the first credit assistance conversation."
+    },
+    {
+      "id": "cpr_credit_proposal",
+      "name": "CPR / credit proposal completed, signed, dated (<90 days), fees complete",
+      "keywords": ["credit proposal", "client profile and recommendation", "cpr"],
+      "broker_action": "Verify the CPR/credit proposal is complete, signed, dated within the last 90 days, and all fee disclosures are filled in."
+    },
+    {
+      "id": "bid_evidence",
+      "name": "Best Interests Duty evidence (3-lender comparison, lowest-cost rationale, recommended-product reasons, TMD fit)",
+      "keywords": ["best interests duty", "product comparison", "target market determination", "reasons for recommendation", "lowest cost"],
+      "broker_action": "Confirm a documented comparison of at least 3 lenders, a lowest-cost rationale, written reasons for the recommended product, and a target market determination (TMD) fit assessment."
+    },
+    {
+      "id": "interview_file_notes",
+      "name": "Interview details and chronological file notes",
+      "keywords": ["file note", "call note", "interview date", "spoke with client"],
+      "broker_action": "Confirm interview details are recorded and file notes are chronological and complete."
+    },
+    {
+      "id": "identity_aml_verification",
+      "name": "Identity / AML verification",
+      "keywords": ["id document", "passport", "driver licence", "driver's licence", "verification of identity", "voi"],
+      "broker_action": "Confirm identity has been verified to AML/CTF standard (e.g. VOI process) with certified ID documents on file."
+    },
+    {
+      "id": "income_employment_consistency",
+      "name": "Income and employment evidence consistency",
+      "keywords": ["payslip", "notice of assessment", "employment"],
+      "broker_action": "Cross-check declared income and employment against payslips, tax returns and NOAs; resolve any inconsistencies before submission."
+    },
+    {
+      "id": "living_expense_review",
+      "name": "Living expense review vs statements",
+      "keywords": ["living expenses", "household expenditure measure", "hem", "bank statement"],
+      "broker_action": "Compare declared living expenses against bank statement transaction patterns and note any material variance."
+    },
+    {
+      "id": "conflicts_of_interest",
+      "name": "Conflicts of interest disclosure",
+      "keywords": ["conflict of interest", "referral relationship", "commission disclosure"],
+      "broker_action": "Confirm any conflicts of interest (referral relationships, commissions, ownership links) have been disclosed to the client in writing."
+    },
+    {
+      "id": "credit_history_explanation",
+      "name": "Credit history explanation where flagged",
+      "keywords": ["credit report", "default", "adverse credit", "credit enquiries"],
+      "broker_action": "Where the credit report shows defaults or adverse listings, obtain and file the client's written explanation."
+    }
+  ]
+}

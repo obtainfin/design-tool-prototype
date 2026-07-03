@@ -1,0 +1,65 @@
+{
+  "_note": "Keyword classifier config. filename hits are weighted 3x text hits. First document type to reach the highest weighted score wins; ties keep the earlier-declared type. If nothing scores above zero, the document is 'unknown document'.",
+  "document_types": {
+    "payslip": {
+      "filename_keywords": ["payslip", "pay slip", "payadvice", "pay advice", "remittance"],
+      "text_keywords": ["payslip", "pay slip", "gross pay", "net pay", "ytd earnings", "year to date", "employer", "pay period", "tax withheld", "superannuation", "hours worked"]
+    },
+    "bank statement": {
+      "filename_keywords": ["bank statement", "bankstatement", "statement", "transaction history"],
+      "text_keywords": ["opening balance", "closing balance", "account number", "bsb", "statement period", "transaction date", "withdrawal", "deposit", "available balance"]
+    },
+    "tax return": {
+      "filename_keywords": ["tax return", "taxreturn", "itr"],
+      "text_keywords": ["income tax return", "taxable income", "total income", "tax return for", "ato", "individual tax return", "business income statement"]
+    },
+    "notice of assessment": {
+      "filename_keywords": ["noa", "notice of assessment"],
+      "text_keywords": ["notice of assessment", "this is not a bill", "taxable income", "assessed tax", "amount you owe", "medicare levy"]
+    },
+    "ID document": {
+      "filename_keywords": ["passport", "licence", "license", "id doc", "drivers licence", "driver's licence"],
+      "text_keywords": ["passport no", "date of birth", "driver licence", "driver's licence", "licence number", "commonwealth of australia", "card number"]
+    },
+    "contract of sale": {
+      "filename_keywords": ["contract of sale", "contractofsale", "coas", "sale contract"],
+      "text_keywords": ["contract of sale", "vendor", "purchaser", "deposit holder", "cooling off", "settlement date", "particulars of sale", "land title"]
+    },
+    "rates notice": {
+      "filename_keywords": ["rates notice", "council rates"],
+      "text_keywords": ["rates notice", "council rates", "land value", "rateable value", "unimproved value", "local government"]
+    },
+    "credit report": {
+      "filename_keywords": ["credit report", "creditreport", "equifax", "illion"],
+      "text_keywords": ["credit report", "credit score", "credit enquiries", "defaults", "credit file", "comprehensive credit reporting"]
+    },
+    "loan statement": {
+      "filename_keywords": ["loan statement", "mortgage statement", "loanstatement"],
+      "text_keywords": ["loan account", "interest rate", "principal balance", "loan statement", "redraw", "amortisation", "current loan balance"]
+    },
+    "fact find": {
+      "filename_keywords": ["fact find", "factfind", "needs analysis"],
+      "text_keywords": ["fact find", "objectives and requirements", "client objectives", "financial situation", "loan preferences", "future plans"]
+    },
+    "client email": {
+      "filename_keywords": [".eml", "email"],
+      "text_keywords": ["from:", "sent:", "subject:", "to:", "regards", "kind regards"]
+    },
+    "broker note": {
+      "filename_keywords": ["file note", "call note", "broker note"],
+      "text_keywords": ["file note", "call note", "spoke with client", "discussed with client", "broker note"]
+    },
+    "compliance document": {
+      "filename_keywords": ["credit guide", "privacy consent", "credit proposal", "cpr", "tmd", "compliance"],
+      "text_keywords": ["credit guide", "privacy consent", "credit proposal", "target market determination", "best interests duty", "ncc", "national consumer credit"]
+    },
+    "Client Profile and Recommendation": {
+      "filename_keywords": ["client profile and recommendation", "cpr report"],
+      "text_keywords": ["client profile and recommendation", "recommended product", "reasons for recommendation", "comparison of products"]
+    },
+    "unknown document": {
+      "filename_keywords": [],
+      "text_keywords": []
+    }
+  }
+}

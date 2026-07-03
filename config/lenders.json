@@ -1,0 +1,15 @@
+{
+  "_note": "Placeholder lender list; verify all policy from current lender sources; not live policy data.",
+  "lenders": [
+    {"code": "CBA", "name": "Commonwealth Bank of Australia", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "WBC", "name": "Westpac", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "NAB", "name": "National Australia Bank", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "ANZ", "name": "ANZ", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "MQG", "name": "Macquarie Bank", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "ING", "name": "ING", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "SUN", "name": "Suncorp Bank", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "BWA", "name": "Bankwest", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "STG", "name": "St.George Bank", "note": "placeholder; verify all policy from current lender sources; not live policy data"},
+    {"code": "AMP", "name": "AMP Bank", "note": "placeholder; verify all policy from current lender sources; not live policy data"}
+  ]
+}
